@@ -1,6 +1,6 @@
 // https://umijs.org/config/
 import os from 'os';
-import pageRoutes from './router.config';
+// import pageRoutes from './router.config';
 import webpackPlugin from './plugin.config';
 import defaultSettings from '../src/defaultSettings';
 import slash from 'slash2';
@@ -21,6 +21,11 @@ const plugins = [
         enable: true, // default false
         default: 'zh-CN', // default zh-CN
         baseNavigator: true, // default true, when it is true, will use `navigator.language` overwrite default
+      },
+      routes: {
+        update(routes) {
+          return [...require('../src/pages/_routes'), ...routes];
+        },
       },
       dynamicImport: {
         loadingComponent: './components/PageLoading/index',
@@ -46,6 +51,17 @@ const plugins = [
         : {}),
     },
   ],
+  [
+    'umi-plugin-authorize',
+    {
+      authorize: [
+        {
+          guard: ['src/pages/Auth'],
+          include: /\//,
+          exclude: /\/user/i,
+        },
+      ],
+    },
 ];
 
 // 针对 preview.pro.ant.design 的 GA 统计代码
@@ -72,7 +88,7 @@ export default {
   },
   devtool: ANT_DESIGN_PRO_ONLY_DO_NOT_USE_IN_YOUR_PRODUCTION ? 'source-map' : false,
   // 路由配置
-  routes: pageRoutes,
+  // routes: pageRoutes,
   // Theme for antd
   // https://ant.design/docs/react/customize-theme-cn
   theme: {
