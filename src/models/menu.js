@@ -122,11 +122,13 @@ export default {
 
     *getMenuData(_, { put, call }) {
       const { routes, authority } = yield call(queryMenu);
+
+      // var data1=[...require('../pages/_routes')];
+      // var data2 =[...require('../pages/_routes'),routes];
       const menuData = filterMenuData(memoizeOneFormatter(routes, authority));
       const breadcrumbNameMap = memoizeOneGetBreadcrumbNameMap(menuData);
       yield put({
         type: 'save',
-        payload: { menuData, breadcrumbNameMap },
         payload: { menuData, breadcrumbNameMap, routerData: routes },
       });
     },

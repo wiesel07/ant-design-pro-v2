@@ -37,10 +37,10 @@ export default {
             {
               path: '/forms/stepform',
               name: 'stepform',
-              hideChildrenInMenu: true,
+              hideChildrenInMenu: false,
               routes: [
                 {
-                  path: '/forms/stepform/info',
+                  path: '/forms/stepform/index',
                   name: 'info',
                 },
                 {
@@ -191,6 +191,21 @@ export default {
               ],
             },
           ],
+        },
+        {
+          path: '/system',
+          icon: 'table',
+          name: 'system',
+          routes: [
+            {
+              path: '/system/dict/index',
+              name: 'dict',
+            },
+            {
+              path: '/system/role/indexy',
+              name: 'role',
+            },
+          ]
         },
       ],
     },

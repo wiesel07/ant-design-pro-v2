@@ -10,6 +10,7 @@ export default {
 
   state: {
     status: undefined,
+    isLogin: false,
   },
 
   effects: {
