@@ -29,3 +29,23 @@ export async function removeDict(params) {
     },
   });
 }
+
+
+export async function addDict(params) {
+  return request(`${baseUrl}/system/sysDict/remove`, {
+    method: 'DELETE',
+    body: {
+      ...params,
+    },
+  });
+}
+
+
+export async function updateDict(params) {
+  return request(`${baseUrl}/system/sysDict/remove`, {
+    method: 'DELETE',
+    body: {
+      ...params,
+    },
+  });
+}

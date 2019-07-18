@@ -3,8 +3,8 @@ export default {
   namespace: 'System.User',
 
   state: {
-    gridData: [],
-    pagination: {},
+    pageData: {},
+    // pagination: {},
   },
 
   effects: {
@@ -21,9 +21,9 @@ export default {
       // };
 
       const result = {
-        list: [],
+        list: [{'userId':1,'userName':'张三','userCode':'ZS'}],
         pagination: {
-          total: 0,
+          total: 1,
           pageSize: 10,
           current: 1,
         },
@@ -72,7 +72,7 @@ export default {
     save(state, action) {
       return {
         ...state,
-        pageData: action.payload.data,
+        pageData: action.payload,
       };
     },
   },

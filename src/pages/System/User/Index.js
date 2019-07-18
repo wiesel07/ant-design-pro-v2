@@ -35,9 +35,9 @@ import styles from './User.less';
 // }
 
 @connect(state => {
-  return {
-    gridData: state[modelName].data,
-    loading: state.loading.effects.queryPage,
+  return  {
+    pageData: state[modelName].pageData,
+    loading: state.loading.models[modelName],
   };
 })
 @Form.create()
