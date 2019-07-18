@@ -2,14 +2,12 @@ import { stringify } from 'qs';
 import request from '@/utils/request';
 import { baseUrl } from '@/services/apiConstant';
 
-
-// 字典管理模块接口API
-export async function queryDictPage(params) {
-  return request(`${baseUrl}/system/sysDict/pages?${stringify(params)}`);
+// 用户模块接口
+export async function queryUserPage(params) {
+  return request(`/smart-web/system/role/pages?${stringify(params)}`);
 }
 
-export async function removeDict(params) {
-  //return request(`${baseUrl}/system/sysDict/remove?${stringify(params)}`);
+export async function removeUser(params) {
   return request(`${baseUrl}/system/sysDict/remove`, {
     method: 'DELETE',
     body: {
@@ -18,28 +16,15 @@ export async function removeDict(params) {
   });
 }
 
-export async function addDict(params) {
-  // return request(`${baseUrl}/system/sysDict/add`, {
-  //   method: 'POST',
-  //   data: {
-  //     ...params,
-  //     method: 'post',
-  //   },
-  // });
-
-  return request(`${baseUrl}/system/sysDict/add`, {
-    method: 'POST',
-    body: {
-      ...params,
-    },
-  });
+// 字典模块接口
+export async function queryDictPage(params) {
+  return request(`/smart-web/system/role/pages?${stringify(params)}`);
 }
 
-
-export async function updateDict(params) {
-  return request(`${baseUrl}/system/sysDict/update`, {
-    method: 'PUT',
-    data: {
+export async function removeDict(params) {
+  return request(`${baseUrl}/system/sysDict/remove`, {
+    method: 'DELETE',
+    body: {
       ...params,
     },
   });

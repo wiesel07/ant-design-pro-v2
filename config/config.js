@@ -18,13 +18,14 @@ const plugins = [
         hmr: true,
       },
       locale: {
-        enable: false, // default false
+        enable: true, // default false
         default: 'zh-CN', // default zh-CN
-        baseNavigator: false, // default true, when it is true, will use `navigator.language` overwrite default
+        baseNavigator: true, // default true, when it is true, will use `navigator.language` overwrite default
       },
       routes: {
         update(routes) {
           return [...require('../src/pages/_routes'), ...routes];
+          // return [ ...routes];
         },
       },
       dynamicImport: {
@@ -62,7 +63,7 @@ const plugins = [
         },
       ],
     },
-  ], 
+  ],
 ];
 
 // 针对 preview.pro.ant.design 的 GA 统计代码

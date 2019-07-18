@@ -13,40 +13,34 @@ import { connect } from 'dva';
 //   return <BasicLayout {...props} />;
 // };
 
-
 function mapStateToProps({ login }) {
   return {
     isLogin: login.isLogin,
   };
 }
 
+const app = () =>
+  withRouter(props => {
+    const { location } = props;
+    const { pathname } = location;
+    // if (/\/user/i.test(pathname)) {
+    //   return <UserLayout {...props} />;
+    // }
+    return <BasicLayout {...props} />;
+  });
 
-const app = () => 
-  withRouter(
-     props => {
-      const { location } = props;
-      const { pathname } = location;
-      if (/\/user/i.test(pathname)) {
-        return <UserLayout {...props} />;
-      }
-      return <BasicLayout {...props} />;
-    }
-  );
-
-  // const app = () => 
-  // withRouter(
-  //   connect(mapStateToProps)((props,{  isLogin }) => {
-  //     console.log(isLogin+"=========")
-  //        const { location } = props;
-  //        const { pathname } = location;
-  //    if (/\/user/i.test(pathname)) {
-  //       return <UserLayout {...props} />;
-  //     }
-  //     return <BasicLayout {...props} />;
-  //   })
-  // );
-
-
+// const app = () =>
+// withRouter(
+//   connect(mapStateToProps)(({ props, isLogin }) => {
+//     console.log(isLogin+"=========")
+//        const { location } = props;
+//        const { pathname } = location;
+//   //  if (/\/user/i.test(pathname)) {
+//   //     return <UserLayout {...props} />;
+//   //   }
+//     return <BasicLayout {...props} />;
+//   })
+// );
 
 export default dynamic({
   loader: async () => {

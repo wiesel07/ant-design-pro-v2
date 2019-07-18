@@ -1,6 +1,6 @@
-import { queryDictPage, removeDict, addDict, updateDict } from '@/services/systemApi';
+import { queryUserPage, removeUser } from '@/services/systemApi';
 export default {
-  namespace: 'System.Dict',
+  namespace: 'System.User',
 
   state: {
     gridData: [],
@@ -8,8 +8,8 @@ export default {
   },
 
   effects: {
-    *fetch({ payload }, { call, put }) {
-      // const response = yield call(queryDictPage, payload);
+    *queryPage({ payload }, { call, put }) {
+      // const response = yield call(queryUserPage, payload);
       // const data = response.data;
       // const result = {
       //     list: data.rows || [],
@@ -34,14 +34,14 @@ export default {
         payload: result,
       });
     },
-    *add({ payload, callback }, { call, put }) {
-      const response = yield call(addDict, payload);
-      yield put({
-        type: 'save',
-        payload: response,
-      });
-      if (callback) callback();
-    },
+    //   *add({ payload, callback }, { call, put }) {
+    //     const response = yield call(addRule, payload);
+    //     yield put({
+    //       type: 'save',
+    //       payload: response,
+    //     });
+    //     if (callback) callback();
+    //   },
     //   *remove({ payload, callback }, { call, put }) {
     //     const response = yield call(removeRule, payload);
     //     yield put({
@@ -59,7 +59,7 @@ export default {
     //     if (callback) callback();
     //   },
     *remove({ payload, callback }, { call, put }) {
-      const response = yield call(removeDict, payload);
+      const response = yield call(removeUser, payload);
       yield put({
         type: 'save',
         payload: response,
@@ -72,7 +72,7 @@ export default {
     save(state, action) {
       return {
         ...state,
-        data: action.payload,
+        pageData: action.payload.data,
       };
     },
   },

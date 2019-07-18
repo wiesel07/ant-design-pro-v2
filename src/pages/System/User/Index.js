@@ -25,14 +25,14 @@ import BusTable from '@/components/BusTable';
 const FormItem = Form.Item;
 const { Option } = Select;
 const { TextArea } = Input;
-const modelName = 'System.Dict';
-import styles from './Dict.less';
+const modelName = 'System.User';
+import styles from './User.less';
 
-const actions = {
-  ADD: 'ADD',
-  UPDATE: 'UPDATE',
-  VIEW: 'VIEW',
-};
+// const actions = {
+//     ADD: "ADD",
+//     UPDATE: "UPDATE",
+//     VIEW: "VIEW",
+// }
 
 @connect(state => {
   return {
@@ -41,20 +41,22 @@ const actions = {
   };
 })
 @Form.create()
-class SystemDict extends React.Component {
+class SystemUser extends React.Component {
   state = {
     modalVisible: false,
     selectedRows: [],
     formValues: {},
+    done: false,
+    action: '',
   };
   columns = [
     {
-      title: '字典编码',
-      dataIndex: 'dictCode',
+      title: '用户名',
+      dataIndex: 'userName',
     },
     {
-      title: '字典名称',
-      dataIndex: 'dictName',
+      title: '用户编码',
+      dataIndex: 'userCode',
     },
     {
       title: '操作',
@@ -66,7 +68,7 @@ class SystemDict extends React.Component {
                     <Divider type="vertical" /> */}
           <DeleteConfirm
             method={`${modelName}/remove`}
-            params={{ id: record.dictId }}
+            params={{ id: record.userId }}
             dispatch={this.props.dispatch}
             callback={this.refreshTable}
           />
@@ -98,8 +100,6 @@ class SystemDict extends React.Component {
   handleQuery = () => {
     console.log('handleQuery');
   };
-
-  showModal = () => {};
 
   renderSimpleForm() {
     const {
@@ -143,9 +143,8 @@ class SystemDict extends React.Component {
 
     //将数据拼接成StandardTable组件需要的格式
     const { selectedRows } = this.state;
-
     return (
-      <PageHeaderWrapper title="字典管理">
+      <PageHeaderWrapper title="用户管理">
         <Card bordered={false}>
           <div className={styles.tableList}>
             <div className={styles.tableListForm}>{this.renderSimpleForm()}</div>
@@ -153,7 +152,9 @@ class SystemDict extends React.Component {
               <Button
                 icon="plus"
                 type="primary"
-                onClick={() => this.showModal({}, true, actions.ADD)}
+                onClick={() => {
+                  console.log('add');
+                }}
               >
                 新建
               </Button>
@@ -173,8 +174,8 @@ class SystemDict extends React.Component {
               loading={loading}
               selectedRows={selectedRows}
               columns={this.columns}
-              rowKey={'dictId'}
-              data={gridData}
+              rowKey={'userId'}
+              data={pageData}
               onSelectRow={this.handleSelectRows}
             />
           </div>
@@ -184,4 +185,4 @@ class SystemDict extends React.Component {
   }
 }
 
-export default SystemDict;
+export default SystemUser;
