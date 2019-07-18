@@ -81,14 +81,42 @@ class SystemUser extends React.Component {
     this.refreshTable();
   }
 
+  // 表格数据刷新
   refreshTable = () => {
     const { dispatch } = this.props;
     dispatch({
       type: `${modelName}/queryPage`,
       payload: {
-        pageNo: '1',
-        pageSize: '10',
+        // pageNo: '1',
+        // pageSize: '10',
       },
+    });
+  };
+
+//  表格数据变化监听事件
+  handleStandardTableChange = (pagination, filtersArg, sorter) => {
+    const { dispatch } = this.props;
+    const { formValues } = this.state;
+
+    const filters = Object.keys(filtersArg).reduce((obj, key) => {
+      const newObj = { ...obj };
+      newObj[key] = getValue(filtersArg[key]);
+      return newObj;
+    }, {});
+
+    const params = {
+      pageNo: pagination.current,
+      pageSize: pagination.pageSize,
+      ...formValues,
+      ...filters,
+    };
+    if (sorter.field) {
+      params.sorter = `${sorter.field}_${sorter.order}`;
+    }
+
+    dispatch({
+      type: `${modelName}/queryPage`,
+      payload: params,
     });
   };
 
@@ -163,7 +191,7 @@ class SystemUser extends React.Component {
                   <Button>批量操作</Button>
                   <Dropdown overlay={menu}>
                     <Button>
-                      更多操作 <Icon type="down" />
+             f         更多操作 <Icon type="down" />
                     </Button>
                   </Dropdown>
                 </span>
@@ -177,6 +205,7 @@ class SystemUser extends React.Component {
               rowKey={'userId'}
               data={pageData}
               onSelectRow={this.handleSelectRows}
+              onChange={this.handleStandardTableChange}
             />
           </div>
         </Card>

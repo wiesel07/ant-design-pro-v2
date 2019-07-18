@@ -4,11 +4,11 @@ import { baseUrl } from '@/services/apiConstant';
 
 // 用户模块接口
 export async function queryUserPage(params) {
-  return request(`/smart-web/system/role/pages?${stringify(params)}`);
+  return request(`${baseUrl}/system/user/pages?${stringify(params)}`);
 }
 
 export async function removeUser(params) {
-  return request(`${baseUrl}/system/sysDict/remove`, {
+  return request(`${baseUrl}/system/user/remove`, {
     method: 'DELETE',
     body: {
       ...params,
@@ -18,11 +18,11 @@ export async function removeUser(params) {
 
 // 字典模块接口
 export async function queryDictPage(params) {
-  return request(`/smart-web/system/role/pages?${stringify(params)}`);
+  return request(`${baseUrl}/system/dict/pages?${stringify(params)}`);
 }
 
 export async function removeDict(params) {
-  return request(`${baseUrl}/system/sysDict/remove`, {
+  return request(`${baseUrl}/system/dict/remove`, {
     method: 'DELETE',
     body: {
       ...params,

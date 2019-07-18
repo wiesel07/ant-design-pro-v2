@@ -9,25 +9,25 @@ export default {
 
   effects: {
     *queryPage({ payload }, { call, put }) {
-      // const response = yield call(queryUserPage, payload);
-      // const data = response.data;
-      // const result = {
-      //     list: data.rows || [],
-      //     pagination: {
-      //         total: parseInt(data.total),
-      //         pageSize: parseInt(data.size),
-      //         current: parseInt(data.current)
-      //     },
-      // };
-
+      const response = yield call(queryUserPage, payload);
+      const data = response.data;
       const result = {
-        list: [{'userId':1,'userName':'张三','userCode':'ZS'}],
-        pagination: {
-          total: 1,
-          pageSize: 10,
-          current: 1,
-        },
+          list: data.rows || [],
+          pagination: {
+              total: parseInt(data.total),
+              pageSize: parseInt(data.size),
+              current: parseInt(data.current)
+          },
       };
+
+      // const result = {
+      //   list: [{'userId':1,'userName':'张三','userCode':'ZS'}],
+      //   pagination: {
+      //     total: 1,
+      //     pageSize: 10,
+      //     current: 1,
+      //   },
+      // };
 
       yield put({
         type: 'save',

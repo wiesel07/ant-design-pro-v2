@@ -36,8 +36,8 @@ const actions = {
 
 @connect(state => {
   return {
-    gridData: state[modelName].data,
-    loading: state.loading.effects.queryPage,
+    pageData: state[modelName].pageData,
+    loading: state.loading.models[modelName],
   };
 })
 @Form.create()

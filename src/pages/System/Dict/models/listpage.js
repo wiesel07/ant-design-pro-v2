@@ -3,8 +3,7 @@ export default {
   namespace: 'System.Dict',
 
   state: {
-    pageData: [],
-    pagination: {},
+    pageData: {},
   },
 
   effects: {
