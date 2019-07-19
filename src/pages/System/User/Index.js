@@ -1,4 +1,5 @@
 import React, { PureComponent, Fragment } from 'react';
+import { findDOMNode } from 'react-dom';
 import { connect } from 'dva';
 import {
   Table,
@@ -15,6 +16,7 @@ import {
   Popconfirm,
   message,
   Divider,
+  Dropdown,
 } from 'antd';
 import StandardTable from '@/components/StandardTable';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
@@ -35,7 +37,7 @@ import styles from './User.less';
 // }
 
 @connect(state => {
-  return  {
+  return {
     pageData: state[modelName].pageData,
     loading: state.loading.models[modelName],
   };
@@ -43,12 +45,17 @@ import styles from './User.less';
 @Form.create()
 class SystemUser extends React.Component {
   state = {
-    modalVisible: false,
     selectedRows: [],
+    modalDone: false,
+    modalVisible: false,
     formValues: {},
-    done: false,
-    action: '',
   };
+
+  formLayout = {
+    labelCol: { span: 7 },
+    wrapperCol: { span: 13 },
+  };
+
   columns = [
     {
       title: '用户名',
@@ -62,10 +69,14 @@ class SystemUser extends React.Component {
       title: '操作',
       render: (text, record) => (
         <Fragment>
-          {/* <a onClick={() => this.handleModalVisible(true, record)}>修改</a>
-                    <Divider type="vertical" />
-                    <a onClick={() => this.handleModalVisible(true, record)}>详情</a>
-                    <Divider type="vertical" /> */}
+          <a onClick={e => {
+            e.preventDefault();
+            this.showEditModal( record)
+          }
+          }>编辑</a>
+          <Divider type="vertical" />
+          {/* <a onClick={() => this.handleModalVisible(true, record)}>详情</a>
+          <Divider type="vertical" /> */}
           <DeleteConfirm
             method={`${modelName}/remove`}
             params={{ id: record.userId }}
@@ -93,7 +104,7 @@ class SystemUser extends React.Component {
     });
   };
 
-//  表格数据变化监听事件
+  //  表格数据变化监听事件
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
     const { dispatch } = this.props;
     const { formValues } = this.state;
@@ -120,13 +131,60 @@ class SystemUser extends React.Component {
     });
   };
 
+  // 模态框显隐
+  showModal = () => {
+    this.setState({
+      modalVisible: true,
+      current: undefined,
+    });
+  };
+
+  showEditModal = item => {
+    this.setState({
+      modalVisible: true,
+      current: item,
+    });
+  };
+
   handleSelectRows = rows => {
     this.setState({
       selectedRows: rows,
     });
   };
-  handleQuery = () => {
-    console.log('handleQuery');
+
+
+  handleFormReset = () => {
+    const { form, dispatch } = this.props;
+    form.resetFields();
+    this.setState({
+      formValues: {},
+    });
+    // 表格刷新
+    this.refreshTable();
+  };
+
+  handleSearch = () => {
+   // e.preventDefault();
+
+    const { dispatch, form } = this.props;
+
+    form.validateFields((err, fieldsValue) => {
+      if (err) return;
+
+      console.log(fieldsValue);
+      const values = {
+        ...fieldsValue,
+      };
+
+      this.setState({
+        formValues: values,
+      });
+
+      // dispatch({
+      //   type: 'rule/fetch',
+      //   payload: values,
+      // });
+    });
   };
 
   renderSimpleForm() {
@@ -137,13 +195,13 @@ class SystemUser extends React.Component {
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
           <Col md={8} sm={24}>
-            <FormItem label="申请日期">
-              {getFieldDecorator('billDate')(<Input placeholder="请输入" />)}
+            <FormItem label="规则名称">
+              {getFieldDecorator('name')(<Input placeholder="请输入" />)}
             </FormItem>
           </Col>
           <Col md={8} sm={24}>
-            <FormItem label="管理模式">
-              {getFieldDecorator('patternTypeName')(
+            <FormItem label="使用状态">
+              {getFieldDecorator('status')(
                 <Select placeholder="请选择" style={{ width: '100%' }}>
                   <Option value="0">关闭</Option>
                   <Option value="1">运行中</Option>
@@ -153,7 +211,7 @@ class SystemUser extends React.Component {
           </Col>
           <Col md={8} sm={24}>
             <span className={styles.submitButtons}>
-              <Button type="primary" htmlType="submit" onClick={this.handleQuery}>
+              <Button type="primary" htmlType="submit">
                 查询
               </Button>
               <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
@@ -166,11 +224,99 @@ class SystemUser extends React.Component {
     );
   }
 
-  render() {
-    const { pageData, loading } = this.props;
 
-    //将数据拼接成StandardTable组件需要的格式
-    const { selectedRows } = this.state;
+  // 模态框相应操作
+  handleDone = () => {
+    
+    setTimeout(() => this.addBtn.blur(), 0);
+    this.setState({
+      modalDone: false,
+      modalVisible: false,
+    });
+  };
+
+  handleCancel = () => {
+    setTimeout(() => this.addBtn.blur(), 0);
+    this.setState({
+      modalVisible: false,
+    });
+  };
+
+  handleSubmit = e => {
+    
+    e.preventDefault();
+    const { dispatch, form } = this.props;
+    const { current } = this.state;
+    const id = current ? current.id : '';
+
+    setTimeout(() => this.addBtn.blur(), 0);
+    form.validateFields((err, fieldsValue) => {
+      if (err) return;
+      this.setState({
+        modalDone: true,
+      });
+      // dispatch({
+      //   type: 'list/submit',
+      //   payload: { id, ...fieldsValue },
+      // });
+    });
+  };
+
+  getModalContent = (modalDone,current) => {
+    const { form: { getFieldDecorator },} = this.props;
+    if (modalDone) {
+      return (
+        <Result
+          type="success"
+          title="操作成功"
+          description="一系列的信息描述，很短同样也可以带标点。"
+          actions={
+            <Button type="primary" onClick={this.handleDone}>
+              知道了
+            </Button>
+          }
+          className={styles.formResult}
+        />
+      );
+    }
+    return (
+      <Form onSubmit={this.handleSubmit}>
+        <FormItem label="用户名" {...this.formLayout}>
+          {getFieldDecorator('userName', {
+            rules: [{ required: true, message: '请输入用户名' }],
+            initialValue: current.userName,
+          })(<Input placeholder="请输入" />)}
+        </FormItem>
+        <FormItem label="用户编码" {...this.formLayout}>
+          {getFieldDecorator('userCode', {
+            rules: [{ required: true, message: '请输入用户编码' }],
+            initialValue: current.userCode,
+          })(<Input placeholder="请输入" />)}
+        </FormItem>
+        <FormItem {...this.formLayout} label="备注">
+          {getFieldDecorator('remark', {
+            rules: [{ message: '请输入至少五个字符的备注述！', min: 5 }],
+            initialValue: current.remark?current.remark:'aaaaaaaaaaaaaaaaaa',
+          })(<TextArea rows={4} placeholder="请输入至少五个字符" />)}
+        </FormItem>
+      </Form>
+    );
+  };
+
+
+  render() {
+    const { pageData, loading , } = this.props;
+
+    const { selectedRows, modalVisible, modalDone, current = {} } = this.state;
+    
+    const modalContent =this.getModalContent(modalDone,current);
+
+
+    // 窗口关闭后去除onOk方法
+    const modalFooter = modalDone
+      ? { footer: null, onCancel: this.handleDone }
+      : { okText: '保存', onOk: this.handleSubmit, onCancel: this.handleCancel };
+
     return (
       <PageHeaderWrapper title="用户管理">
         <Card bordered={false}>
@@ -180,8 +326,12 @@ class SystemUser extends React.Component {
               <Button
                 icon="plus"
                 type="primary"
-                onClick={() => {
-                  console.log('add');
+                icon="plus"
+                onClick={this.showModal}
+                ref={component => {
+                  /* eslint-disable */
+                  this.addBtn = findDOMNode(component);
+                  /* eslint-enable */
                 }}
               >
                 新建
@@ -191,7 +341,7 @@ class SystemUser extends React.Component {
                   <Button>批量操作</Button>
                   <Dropdown overlay={menu}>
                     <Button>
-             f         更多操作 <Icon type="down" />
+                      更多操作 <Icon type="down" />
                     </Button>
                   </Dropdown>
                 </span>
@@ -209,6 +359,18 @@ class SystemUser extends React.Component {
             />
           </div>
         </Card>
+
+        <Modal
+          title={modalDone ? null : `任务${current.id ? '编辑' : '添加'}`}
+          className={styles.standardListForm}
+          width={640}
+          bodyStyle={modalDone ? { padding: '72px 0' } : { padding: '28px 0 0' }}
+          destroyOnClose
+          visible={modalVisible}
+          {...modalFooter}
+        >
+          {modalContent}
+        </Modal>
       </PageHeaderWrapper>
     );
   }
