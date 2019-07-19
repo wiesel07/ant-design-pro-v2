@@ -174,7 +174,7 @@ class SystemDict extends React.Component {
               selectedRows={selectedRows}
               columns={this.columns}
               rowKey={'dictId'}
-              data={gridData}
+              data={pageData}
               onSelectRow={this.handleSelectRows}
             />
           </div>

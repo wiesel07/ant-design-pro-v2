@@ -36,6 +36,66 @@ import styles from './User.less';
 //     VIEW: "VIEW",
 // }
 
+
+
+const SearchForm = Form.create()(props => {
+  const { refreshTable, form } = props;
+  const {getFieldDecorator} = form;
+
+  const handleSearch = () => {
+  
+     form.validateFields((err, fieldsValue) => {
+       if (err) return;
+ 
+       console.log(fieldsValue);
+       const values = {
+         ...fieldsValue,
+       };
+        // 表格刷新
+        refreshTable(values);
+     });
+   };
+
+ const handleFormReset = () => {
+    // const { form, dispatch } = this.props;
+    form.resetFields();
+    // 表格刷新
+    refreshTable();
+  };
+  return (
+    <Form  layout="inline">
+      <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
+        <Col md={8} sm={24}>
+          <FormItem label="规则名称">
+            {getFieldDecorator('name')(<Input placeholder="请输入" />)}
+          </FormItem>
+        </Col>
+        <Col md={8} sm={24}>
+          <FormItem label="使用状态">
+            {getFieldDecorator('status')(
+              <Select placeholder="请选择" style={{ width: '100%' }}>
+                <Option value="0">关闭</Option>
+                <Option value="1">运行中</Option>
+              </Select>
+            )}
+          </FormItem>
+        </Col>
+        <Col md={8} sm={24}>
+          <span className={styles.submitButtons}>
+            <Button type="primary" onClick={handleSearch}>
+              查询
+            </Button>
+            <Button style={{ marginLeft: 8 }} onClick={handleFormReset}>
+              重置
+            </Button>
+          </span>
+        </Col>
+      </Row>
+    </Form>
+  );
+});
+
+
 @connect(state => {
   return {
     pageData: state[modelName].pageData,
@@ -93,14 +153,13 @@ class SystemUser extends React.Component {
   }
 
   // 表格数据刷新
-  refreshTable = () => {
+  refreshTable = (searchFormValues) => {
+
+  console.log(searchFormValues+"测试")
     const { dispatch } = this.props;
     dispatch({
       type: `${modelName}/queryPage`,
-      payload: {
-        // pageNo: '1',
-        // pageSize: '10',
-      },
+      payload: { searchFormValues  },
     });
   };
 
@@ -153,76 +212,76 @@ class SystemUser extends React.Component {
   };
 
 
-  handleFormReset = () => {
-    const { form, dispatch } = this.props;
-    form.resetFields();
-    this.setState({
-      formValues: {},
-    });
-    // 表格刷新
-    this.refreshTable();
-  };
+  // handleFormReset = () => {
+  //   const { form, dispatch } = this.props;
+  //   form.resetFields();
+  //   this.setState({
+  //     formValues: {},
+  //   });
+  //   // 表格刷新
+  //   this.refreshTable();
+  // };
 
-  handleSearch = () => {
-   // e.preventDefault();
+  // handleSearch = () => {
+  //  // e.preventDefault();
 
-    const { dispatch, form } = this.props;
+  //   const { dispatch, form } = this.props;
 
-    form.validateFields((err, fieldsValue) => {
-      if (err) return;
+  //   form.validateFields((err, fieldsValue) => {
+  //     if (err) return;
 
-      console.log(fieldsValue);
-      const values = {
-        ...fieldsValue,
-      };
+  //     console.log(fieldsValue);
+  //     const values = {
+  //       ...fieldsValue,
+  //     };
 
-      this.setState({
-        formValues: values,
-      });
+  //     this.setState({
+  //       formValues: values,
+  //     });
 
-      // dispatch({
-      //   type: 'rule/fetch',
-      //   payload: values,
-      // });
-    });
-  };
+  //     // dispatch({
+  //     //   type: 'rule/fetch',
+  //     //   payload: values,
+  //     // });
+  //   });
+  // };
 
-  renderSimpleForm() {
-    const {
-      form: { getFieldDecorator },
-    } = this.props;
-    return (
-      <Form onSubmit={this.handleSearch} layout="inline">
-        <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
-          <Col md={8} sm={24}>
-            <FormItem label="规则名称">
-              {getFieldDecorator('name')(<Input placeholder="请输入" />)}
-            </FormItem>
-          </Col>
-          <Col md={8} sm={24}>
-            <FormItem label="使用状态">
-              {getFieldDecorator('status')(
-                <Select placeholder="请选择" style={{ width: '100%' }}>
-                  <Option value="0">关闭</Option>
-                  <Option value="1">运行中</Option>
-                </Select>
-              )}
-            </FormItem>
-          </Col>
-          <Col md={8} sm={24}>
-            <span className={styles.submitButtons}>
-              <Button type="primary" htmlType="submit">
-                查询
-              </Button>
-              <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
-                重置
-              </Button>
-            </span>
-          </Col>
-        </Row>
-      </Form>
-    );
-  }
+  // renderSimpleForm() {
+  //   const {
+  //     form: { getFieldDecorator },
+  //   } = this.props;
+  //   return (
+  //     <Form onSubmit={this.handleSearch} layout="inline">
+  //       <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
+  //         <Col md={8} sm={24}>
+  //           <FormItem label="规则名称">
+  //             {getFieldDecorator('name')(<Input placeholder="请输入" />)}
+  //           </FormItem>
+  //         </Col>
+  //         <Col md={8} sm={24}>
+  //           <FormItem label="使用状态">
+  //             {getFieldDecorator('status')(
+  //               <Select placeholder="请选择" style={{ width: '100%' }}>
+  //                 <Option value="0">关闭</Option>
+  //                 <Option value="1">运行中</Option>
+  //               </Select>
+  //             )}
+  //           </FormItem>
+  //         </Col>
+  //         <Col md={8} sm={24}>
+  //           <span className={styles.submitButtons}>
+  //             <Button type="primary" htmlType="submit">
+  //               查询
+  //             </Button>
+  //             <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
+  //               重置
+  //             </Button>
+  //           </span>
+  //         </Col>
+  //       </Row>
+  //     </Form>
+  //   );
+  // }
 
 
   // 模态框相应操作
@@ -317,11 +376,17 @@ class SystemUser extends React.Component {
       ? { footer: null, onCancel: this.handleDone }
       : { okText: '保存', onOk: this.handleSubmit, onCancel: this.handleCancel };
 
+
+      const parentMethods = {
+        refreshTable: this.refreshTable,
+      };
     return (
       <PageHeaderWrapper title="用户管理">
         <Card bordered={false}>
           <div className={styles.tableList}>
-            <div className={styles.tableListForm}>{this.renderSimpleForm()}</div>
+            {/* <div className={styles.tableListForm}>{this.renderSimpleForm()}</div> */}
+            <div className={styles.tableListForm}><SearchForm {...parentMethods} /></div>
+      
             <div className={styles.tableListOperator}>
               <Button
                 icon="plus"
