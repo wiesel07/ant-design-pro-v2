@@ -1,4 +1,4 @@
-import { queryUserPage, removeUser } from '@/services/systemApi';
+import { queryUserPage, removeUser,addUser } from '@/services/systemApi';
 export default {
   namespace: 'System.User',
 
@@ -9,39 +9,39 @@ export default {
 
   effects: {
     *queryPage({ payload }, { call, put }) {
-      // const response = yield call(queryUserPage, payload);
-      // const data = response.data;
-      // const result = {
-      //     list: data.rows || [],
-      //     pagination: {
-      //         total: parseInt(data.total),
-      //         pageSize: parseInt(data.size),
-      //         current: parseInt(data.current)
-      //     },
-      // };
-
+      const response = yield call(queryUserPage, payload);
+      const data = response.data;
       const result = {
-        list: [{'userId':1,'userName':'张三','userCode':'ZS'}],
-        pagination: {
-          total: 1,
-          pageSize: 10,
-          current: 1,
-        },
+          list: data.rows || [],
+          pagination: {
+              total: parseInt(data.total),
+              pageSize: parseInt(data.pageSize),
+              current: parseInt(data.current)
+          },
       };
+
+      // const result = {
+      //   list: [{'userId':1,'userName':'张三','userCode':'ZS'}],
+      //   pagination: {
+      //     total: 1,
+      //     pageSize: 10,
+      //     current: 1,
+      //   },
+      // };
 
       yield put({
         type: 'save',
         payload: result,
       });
     },
-    //   *add({ payload, callback }, { call, put }) {
-    //     const response = yield call(addRule, payload);
-    //     yield put({
-    //       type: 'save',
-    //       payload: response,
-    //     });
-    //     if (callback) callback();
-    //   },
+   *add({ payload, callback }, { call, put }) {
+        const response = yield call(addUser, payload);
+        yield put({
+          type: 'save',
+          payload: response,
+        });
+        if (callback) callback();
+      },
     //   *remove({ payload, callback }, { call, put }) {
     //     const response = yield call(removeRule, payload);
     //     yield put({

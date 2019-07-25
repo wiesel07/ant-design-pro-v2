@@ -15,10 +15,20 @@ export async function removeUser(params) {
     },
   });
 }
+export async function addUser(params) {
+  return request(`${baseUrl}/system/user/add`, {
+    method: 'POST',
+    body: {
+      ...params,
+    },
+  });
+}
+
 
 // 字典模块接口
 export async function queryDictPage(params) {
-  return request(`${baseUrl}/system/dict/pages?${stringify(params)}`);
+   return request(`${baseUrl}/system/dict/pages?${stringify(params)}`);
+   // return request('/api/system/sysDict/pages');
 }
 
 export async function removeDict(params) {

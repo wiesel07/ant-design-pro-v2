@@ -35,47 +35,54 @@ import styles from './User.less';
 //     UPDATE: "UPDATE",
 //     VIEW: "VIEW",
 // }
-
+const status = {
+  '1': '正常',
+  '2': '锁定',
+  '3': '停用',
+  '4': '注销',
+};
 
 
 const SearchForm = Form.create()(props => {
   const { refreshTable, form } = props;
-  const {getFieldDecorator} = form;
+  const { getFieldDecorator } = form;
 
   const handleSearch = () => {
-  
-     form.validateFields((err, fieldsValue) => {
-       if (err) return;
- 
-       console.log(fieldsValue);
-       const values = {
-         ...fieldsValue,
-       };
-        // 表格刷新
-        refreshTable(values);
-     });
-   };
 
- const handleFormReset = () => {
+    form.validateFields((err, fieldsValue) => {
+      if (err) return;
+
+      console.log(fieldsValue);
+      const values = {
+        ...fieldsValue,
+      };
+      // 表格刷新
+      refreshTable(values);
+    });
+  };
+
+  const handleFormReset = () => {
     // const { form, dispatch } = this.props;
     form.resetFields();
     // 表格刷新
     refreshTable();
   };
   return (
-    <Form  layout="inline">
+    <Form layout="inline">
       <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
         <Col md={8} sm={24}>
-          <FormItem label="规则名称">
-            {getFieldDecorator('name')(<Input placeholder="请输入" />)}
+          <FormItem label="用户编码">
+            {getFieldDecorator('userCode')(<Input placeholder="请输入" />)}
           </FormItem>
         </Col>
         <Col md={8} sm={24}>
-          <FormItem label="使用状态">
+          <FormItem label="状态">
             {getFieldDecorator('status')(
               <Select placeholder="请选择" style={{ width: '100%' }}>
-                <Option value="0">关闭</Option>
-                <Option value="1">运行中</Option>
+                <Option value="1">正常</Option>
+                <Option value="2">锁定</Option>
+                <Option value="3">停用</Option>
+                <Option value="9">注销</Option>
               </Select>
             )}
           </FormItem>
@@ -104,62 +111,90 @@ const SearchForm = Form.create()(props => {
 })
 @Form.create()
 class SystemUser extends React.Component {
-  state = {
-    selectedRows: [],
-    modalDone: false,
-    modalVisible: false,
-    formValues: {},
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      selectedRows: [],
+      modalDone: false,
+      modalVisible: false,
+      formValues: {},
+    };
 
-  formLayout = {
-    labelCol: { span: 7 },
-    wrapperCol: { span: 13 },
-  };
+    this.formLayout = {
+      labelCol: { span: 7 },
+      wrapperCol: { span: 13 },
+    };
 
-  columns = [
-    {
-      title: '用户名',
-      dataIndex: 'userName',
-    },
-    {
-      title: '用户编码',
-      dataIndex: 'userCode',
-    },
-    {
-      title: '操作',
-      render: (text, record) => (
-        <Fragment>
-          <a onClick={e => {
-            e.preventDefault();
-            this.showEditModal( record)
-          }
-          }>编辑</a>
-          <Divider type="vertical" />
-          {/* <a onClick={() => this.handleModalVisible(true, record)}>详情</a>
+    this.columns = [
+      {
+        title: '序号',
+        align: 'center',
+        dataIndex: 'xh',
+        render: (text, record, index) => `${index + 1}`,
+      },
+      {
+        title: '用户名',
+        dataIndex: 'userName',
+        render: (text, record) => {
+          return text;
+        }
+      },
+      {
+        title: '用户编码',
+        dataIndex: 'userCode',
+        // width: 300,
+      },
+      {
+        title: '用户类型',
+        dataIndex: 'userType',
+      },
+      {
+        title: '手机号码',
+        dataIndex: 'mobileNo',
+      },
+      {
+        title: '状态',
+        dataIndex: 'status',
+        render: (text, record) => {
+          return status[text];
+        },
+      },
+      {
+        title: '操作',
+        // fixed: 'right',
+        render: (text, record) => (
+          <Fragment>
+            <a onClick={e => {
+              e.preventDefault();
+              this.showEditModal(record)
+            }
+            }>编辑</a>
+            <Divider type="vertical" />
+            {/* <a onClick={() => this.handleModalVisible(true, record)}>详情</a>
           <Divider type="vertical" /> */}
-          <DeleteConfirm
-            method={`${modelName}/remove`}
-            params={{ id: record.userId }}
-            dispatch={this.props.dispatch}
-            callback={this.refreshTable}
-          />
-        </Fragment>
-      ),
-    },
-  ];
+            <DeleteConfirm
+              method={`${modelName}/remove`}
+              params={{ id: record.userId }}
+              dispatch={this.props.dispatch}
+              callback={this.refreshTable}
+            />
+          </Fragment>
+        ),
+      },
+    ];
+  }
 
   componentWillMount() {
     this.refreshTable();
   }
 
-  // 表格数据刷新
-  refreshTable = (searchFormValues) => {
 
-  console.log(searchFormValues+"测试")
+  // 表格数据刷新
+  refreshTable = (params) => {
     const { dispatch } = this.props;
     dispatch({
       type: `${modelName}/queryPage`,
-      payload: { searchFormValues  },
+      payload: { ...params },
     });
   };
 
@@ -211,82 +246,8 @@ class SystemUser extends React.Component {
     });
   };
 
-
-  // handleFormReset = () => {
-  //   const { form, dispatch } = this.props;
-  //   form.resetFields();
-  //   this.setState({
-  //     formValues: {},
-  //   });
-  //   // 表格刷新
-  //   this.refreshTable();
-  // };
-
-  // handleSearch = () => {
-  //  // e.preventDefault();
-
-  //   const { dispatch, form } = this.props;
-
-  //   form.validateFields((err, fieldsValue) => {
-  //     if (err) return;
-
-  //     console.log(fieldsValue);
-  //     const values = {
-  //       ...fieldsValue,
-  //     };
-
-  //     this.setState({
-  //       formValues: values,
-  //     });
-
-  //     // dispatch({
-  //     //   type: 'rule/fetch',
-  //     //   payload: values,
-  //     // });
-  //   });
-  // };
-
-  // renderSimpleForm() {
-  //   const {
-  //     form: { getFieldDecorator },
-  //   } = this.props;
-  //   return (
-  //     <Form onSubmit={this.handleSearch} layout="inline">
-  //       <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
-  //         <Col md={8} sm={24}>
-  //           <FormItem label="规则名称">
-  //             {getFieldDecorator('name')(<Input placeholder="请输入" />)}
-  //           </FormItem>
-  //         </Col>
-  //         <Col md={8} sm={24}>
-  //           <FormItem label="使用状态">
-  //             {getFieldDecorator('status')(
-  //               <Select placeholder="请选择" style={{ width: '100%' }}>
-  //                 <Option value="0">关闭</Option>
-  //                 <Option value="1">运行中</Option>
-  //               </Select>
-  //             )}
-  //           </FormItem>
-  //         </Col>
-  //         <Col md={8} sm={24}>
-  //           <span className={styles.submitButtons}>
-  //             <Button type="primary" htmlType="submit">
-  //               查询
-  //             </Button>
-  //             <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
-  //               重置
-  //             </Button>
-  //           </span>
-  //         </Col>
-  //       </Row>
-  //     </Form>
-  //   );
-  // }
-
-
   // 模态框相应操作
   handleDone = () => {
-    
     setTimeout(() => this.addBtn.blur(), 0);
     this.setState({
       modalDone: false,
@@ -302,27 +263,30 @@ class SystemUser extends React.Component {
   };
 
   handleSubmit = e => {
-    
+
     e.preventDefault();
     const { dispatch, form } = this.props;
     const { current } = this.state;
-    const id = current ? current.id : '';
+    //const id = current ? current.id : '';
 
     setTimeout(() => this.addBtn.blur(), 0);
     form.validateFields((err, fieldsValue) => {
       if (err) return;
-      this.setState({
-        modalDone: true,
+      dispatch({
+        type: `${modelName}/add`,
+        // payload: { id,...fieldsValue },
+        payload: { ...fieldsValue },
+      }).then(() => {
+        this.setState({
+          modalDone: true,
+        })
+        this.refreshTable();
       });
-      // dispatch({
-      //   type: 'list/submit',
-      //   payload: { id, ...fieldsValue },
-      // });
     });
   };
 
-  getModalContent = (modalDone,current) => {
-    const { form: { getFieldDecorator },} = this.props;
+  getModalContent = (modalDone, current) => {
+    const { form, form: { getFieldDecorator }, } = this.props;
     if (modalDone) {
       return (
         <Result
@@ -338,6 +302,16 @@ class SystemUser extends React.Component {
         />
       );
     }
+    const prefixSelector = getFieldDecorator('prefix', {
+      initialValue: '86',
+    })(
+      <Select style={{ width: 70 }}>
+        <Option value="86">+86</Option>
+        <Option value="87">+87</Option>
+      </Select>,
+    );
+
+    //   form.setFieldsValue(current);
     return (
       <Form onSubmit={this.handleSubmit}>
         <FormItem label="用户名" {...this.formLayout}>
@@ -352,23 +326,91 @@ class SystemUser extends React.Component {
             initialValue: current.userCode,
           })(<Input placeholder="请输入" />)}
         </FormItem>
+
+        {/* {!current ? 
+        <FormItem label='密码' hasFeedback {...this.formLayout}>
+          {getFieldDecorator('password', {
+            rules: [
+              {
+                required: true,
+                message: '请输入密码',
+              },
+            ],
+          })(<Input.Password />)}
+        </FormItem>
+        :''} */}
+
+        <FormItem label="手机号码" {...this.formLayout}>
+          {getFieldDecorator('mobileNo', {
+            rules: [{ required: true, message: '请输入手机号码' }],
+            initialValue: current.mobileNo,
+          })(<Input addonBefore={prefixSelector} style={{ width: '100%' }} />)}
+        </FormItem>
+        <FormItem label='状态' {...this.formLayout}>
+          {getFieldDecorator('status', {
+            rules: [{ required: true, message: '请选择状态' }],
+            initialValue: current.status,
+          })(
+            <Select placeholder="请选择状态">
+              <Option value="1">正常</Option>
+              <Option value="2">锁定</Option>
+              <Option value="3">停用</Option>
+              <Option value="4">注销</Option>
+            </Select>
+          )}
+        </FormItem>
         <FormItem {...this.formLayout} label="备注">
           {getFieldDecorator('remark', {
             rules: [{ message: '请输入至少五个字符的备注述！', min: 5 }],
-            initialValue: current.remark?current.remark:'aaaaaaaaaaaaaaaaaa',
+            initialValue: current.remark,
           })(<TextArea rows={4} placeholder="请输入至少五个字符" />)}
         </FormItem>
+
       </Form>
+
+
+      // <Form layout="inline" hideRequiredMark onSubmit={this.handleSubmit}>
+      //   <Row >
+      //     <Col lg={6} md={12} sm={24} span={8}>
+      //       <FormItem label='用户编码'>
+      //         {getFieldDecorator('userCode', {
+      //           rules: [{ required: true, message: '请输入用户编码' }],
+      //         })(<Input placeholder="请输入" />)}
+      //       </FormItem>
+      //     </Col>
+      //     <Col lg={6} md={12} sm={24} span={8}>
+      //       <FormItem label='用户名称'>
+      //         {getFieldDecorator('userName', {
+      //           rules: [{ required: true, message: '请输入用户名称' }],
+      //         })(<Input placeholder="请输入" />)}
+      //       </FormItem>
+      //     </Col>
+      //     <Col lg={6} md={12} sm={24} span={8}>
+      //       <FormItem label='状态'>
+      //         {getFieldDecorator('status', {
+      //           rules: [{ required: true, message: '请选择状态' }],
+      //         })(
+      //           <Select placeholder="请选择状态">
+      //             <Option value="1">正常</Option>
+      //             <Option value="2">锁定</Option>
+      //             <Option value="3">停用</Option>
+      //             <Option value="4">注销</Option>
+      //           </Select>
+      //         )}
+      //       </FormItem>
+      //     </Col>
+      //   </Row>
+      // </Form>
     );
   };
 
 
   render() {
-    const { pageData, loading , } = this.props;
+    const { pageData, loading, } = this.props;
 
     const { selectedRows, modalVisible, modalDone, current = {} } = this.state;
-    
-    const modalContent =this.getModalContent(modalDone,current);
+
+    const modalContent = this.getModalContent(modalDone, current);
 
 
     // 窗口关闭后去除onOk方法
@@ -377,16 +419,16 @@ class SystemUser extends React.Component {
       : { okText: '保存', onOk: this.handleSubmit, onCancel: this.handleCancel };
 
 
-      const parentMethods = {
-        refreshTable: this.refreshTable,
-      };
+    const parentMethods = {
+      refreshTable: this.refreshTable,
+    };
     return (
       <PageHeaderWrapper title="用户管理">
         <Card bordered={false}>
           <div className={styles.tableList}>
             {/* <div className={styles.tableListForm}>{this.renderSimpleForm()}</div> */}
             <div className={styles.tableListForm}><SearchForm {...parentMethods} /></div>
-      
+
             <div className={styles.tableListOperator}>
               <Button
                 icon="plus"
@@ -404,11 +446,11 @@ class SystemUser extends React.Component {
               {selectedRows.length > 0 && (
                 <span>
                   <Button>批量操作</Button>
-                  <Dropdown overlay={menu}>
+                  {/* <Dropdown overlay={menu}>
                     <Button>
                       更多操作 <Icon type="down" />
                     </Button>
-                  </Dropdown>
+                  </Dropdown> */}
                 </span>
               )}
             </div>
@@ -426,7 +468,7 @@ class SystemUser extends React.Component {
         </Card>
 
         <Modal
-          title={modalDone ? null : `任务${current.id ? '编辑' : '添加'}`}
+          title={modalDone ? null : `用户${current.userId ? '编辑' : '添加'}`}
           className={styles.standardListForm}
           width={640}
           bodyStyle={modalDone ? { padding: '72px 0' } : { padding: '28px 0 0' }}

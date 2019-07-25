@@ -7,26 +7,26 @@ export default {
   },
 
   effects: {
-    *fetch({ payload }, { call, put }) {
-      // const response = yield call(queryDictPage, payload);
-      // const data = response.data;
-      // const result = {
-      //     list: data.rows || [],
-      //     pagination: {
-      //         total: parseInt(data.total),
-      //         pageSize: parseInt(data.size),
-      //         current: parseInt(data.current)
-      //     },
-      // };
-
+    *queryPage({ payload }, { call, put }) {
+      const response = yield call(queryDictPage, payload);
+      const data = response.data;
       const result = {
-        list: [],
-        pagination: {
-          total: 0,
-          pageSize: 10,
-          current: 1,
-        },
+          list: data.rows || [],
+          pagination: {
+              total: parseInt(data.total),
+              pageSize: parseInt(data.pageSize),
+              current: parseInt(data.current)
+          },
       };
+
+      // const result = {
+      //   list: [],
+      //   pagination: {
+      //     total: 0,
+      //     pageSize: 10,
+      //     current: 1,
+      //   },
+      // };
 
       yield put({
         type: 'save',
@@ -71,7 +71,7 @@ export default {
     save(state, action) {
       return {
         ...state,
-        data: action.payload,
+        pageData: action.payload,
       };
     },
   },

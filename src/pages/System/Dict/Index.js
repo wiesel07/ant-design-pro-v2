@@ -22,17 +22,108 @@ import Result from '@/components/Result';
 import DeleteConfirm from '@/components/DeleteConfirm';
 import BusTable from '@/components/BusTable';
 
+import UploadFile from '@/components/UploadFile';
+
 const FormItem = Form.Item;
 const { Option } = Select;
 const { TextArea } = Input;
 const modelName = 'System.Dict';
 import styles from './Dict.less';
+import { RegisterCommand } from 'gg-editor';
 
 const actions = {
   ADD: 'ADD',
   UPDATE: 'UPDATE',
   VIEW: 'VIEW',
 };
+
+
+const EditableContext = React.createContext();
+
+const EditableRow = ({ form, index, ...props }) => (
+  <EditableContext.Provider value={form}>
+    <tr {...props} />
+  </EditableContext.Provider>
+);
+
+const EditableFormRow = Form.create()(EditableRow);
+
+
+class EditableCell extends React.Component {
+  state = {
+    editing: false,
+  };
+
+  toggleEdit = () => {
+    const editing = !this.state.editing;
+    this.setState({ editing }, () => {
+      if (editing) {
+        this.input.focus();
+      }
+    });
+  };
+
+  save = e => {
+    // const { record, handleSave } = this.props;
+    const { record } = this.props;
+    this.form.validateFields((error, values) => {
+      if (error && error[e.currentTarget.id]) {
+        return;
+      }
+      this.toggleEdit();
+      // handleSave({ ...record, ...values });
+    });
+  };
+
+  renderCell = form => {
+    this.form = form;
+    const { children, dataIndex, record, title } = this.props;
+    const { editing } = this.state;
+    return editing ? (
+      <Form.Item style={{ margin: 0 }}>
+        {form.getFieldDecorator(dataIndex, {
+          rules: [
+            {
+              required: true,
+              message: `${title} is required.`,
+            },
+          ],
+          initialValue: record[dataIndex],
+        })(<Input ref={node => (this.input = node)} onPressEnter={this.save} onBlur={this.save} />)}
+      </Form.Item>
+    ) : (
+        <div
+          className={styles.editableCellValueWrap}
+          style={{ paddingRight: 24 }}
+          onClick={this.toggleEdit}
+        >
+          {children}
+        </div>
+      );
+  };
+
+  render() {
+    const {
+      editable,
+      dataIndex,
+      title,
+      record,
+      index,
+      // handleSave,
+      children,
+      ...restProps
+    } = this.props;
+    return (
+      <td {...restProps}>
+        {editable ? (
+          <EditableContext.Consumer>{this.renderCell}</EditableContext.Consumer>
+        ) : (
+            children
+          )}
+      </td>
+    );
+  }
+}
 
 @connect(state => {
   return {
@@ -42,39 +133,68 @@ const actions = {
 })
 @Form.create()
 class SystemDict extends React.Component {
-  state = {
-    modalVisible: false,
-    selectedRows: [],
-    formValues: {},
-  };
-  columns = [
-    {
-      title: '字典编码',
-      dataIndex: 'dictCode',
-    },
-    {
-      title: '字典名称',
-      dataIndex: 'dictName',
-    },
-    {
-      title: '操作',
-      render: (text, record) => (
-        <Fragment>
-          {/* <a onClick={() => this.handleModalVisible(true, record)}>修改</a>
+  constructor(props) {
+    super(props);
+    this.state = {
+      modalVisible: false,
+      selectedRows: [],
+      formValues: {},
+    };
+
+    this.fakeIndex = 0;
+    this.licensesCount = 1;
+    this.columns = [
+      {
+        title: '字典编码',
+        dataIndex: 'dictCode',
+        //  colSpan: 0,
+      },
+      {
+        title: '字典名称',
+        dataIndex: 'dictName',
+        render: (text, record) => {
+          const obj = {
+            children: text,
+            props: {},
+          };
+          obj.props.rowSpan = record.rowSpan;
+          return obj;
+        },
+      },
+      {
+        title: '备注',
+        dataIndex: 'remark',
+        editable: true,
+      },
+      {
+        title: '上传',
+        dataIndex: 'status',
+        render: (text, record) => {
+          return <UploadFile test={text} /> 
+        }
+
+      },
+
+      {
+        title: '操作',
+        dataIndex: 'oper',
+        render: (text, record) => (
+          <Fragment>
+            {/* <a onClick={() => this.handleModalVisible(true, record)}>修改</a>
                     <Divider type="vertical" />
                     <a onClick={() => this.handleModalVisible(true, record)}>详情</a>
                     <Divider type="vertical" /> */}
-          <DeleteConfirm
-            method={`${modelName}/remove`}
-            params={{ id: record.dictId }}
-            dispatch={this.props.dispatch}
-            callback={this.refreshTable}
-          />
-        </Fragment>
-      ),
-    },
-  ];
-
+            <DeleteConfirm
+              method={`${modelName}/remove`}
+              params={{ id: record.dictId }}
+              dispatch={this.props.dispatch}
+              callback={this.refreshTable}
+            />
+          </Fragment>
+        ),
+      },
+    ];
+  }
   componentWillMount() {
     this.refreshTable();
   }
@@ -83,10 +203,7 @@ class SystemDict extends React.Component {
     const { dispatch } = this.props;
     dispatch({
       type: `${modelName}/queryPage`,
-      payload: {
-        pageNo: '1',
-        pageSize: '10',
-      },
+      payload: {},
     });
   };
 
@@ -99,7 +216,7 @@ class SystemDict extends React.Component {
     console.log('handleQuery');
   };
 
-  showModal = () => {};
+  showModal = () => { };
 
   renderSimpleForm() {
     const {
@@ -136,11 +253,83 @@ class SystemDict extends React.Component {
         </Row>
       </Form>
     );
+  };
+
+  //遍历子元素，并赋值纵向合并数rowSpan
+  makeData = (data) => {
+    if (!data) return;
+    const sortResult = this.sortData(data);
+    const dataSource = [];
+    sortResult.forEach((item) => {
+      if (item.children) {
+        item.children.forEach((itemOne, indexOne) => {
+          const myObj = itemOne;
+          myObj.rowSpan = indexOne === 0 ? item.span : 0;
+          dataSource.push(myObj);
+        });
+      }
+    });
+    return dataSource;
+  }
+
+  //去重并合并到children
+  sortData = (dataArr) => {
+    const orgArrRe = dataArr.map(item => ({ dictName: item.dictName }));
+    const orgArr = this.uniqueObjArr(orgArrRe, 'dictName');//数组去重
+    for (const childOne of orgArr) { //去重reportName合并到children，得到一共有几个不同的reportName要合并
+      childOne.children = [];
+      for (const childTwo of dataArr) {
+        if (childOne.dictName === childTwo.dictName) { //childOne是去重的，childTwo是没去重的
+          childOne.children.push(childTwo);
+        }
+      }
+    }
+    for (const every of orgArr) {
+      every.span = every.children ? every.children.length : 0;
+    }
+    orgArr.forEach((every) => { every.span = every.children ? every.children.length : 0; });
+    return orgArr;
+  }
+
+  //对象数组去重
+  uniqueObjArr = (arr, fieldName) => {
+    const result = [];
+    const resultArr = [];
+    for (const child of arr) {
+      if (result.indexOf(child[fieldName]) === -1) {
+        result.push(child[fieldName]);
+        resultArr.push(child);
+      }
+    }
+    return resultArr;
   }
 
   render() {
     const { pageData, loading } = this.props;
 
+    const makeData = this.makeData(pageData.list);
+    pageData.list = makeData;
+    const components = {
+      body: {
+        row: EditableFormRow,
+        cell: EditableCell,
+      },
+    };
+    const columnsa = this.columns.map(col => {
+      if (!col.editable) {
+        return col;
+      }
+      return {
+        ...col,
+        onCell: record => ({
+          record,
+          editable: col.editable,
+          dataIndex: col.dataIndex,
+          title: col.title,
+          //  handleSave: this.handleSave,
+        }),
+      };
+    });
     //将数据拼接成StandardTable组件需要的格式
     const { selectedRows } = this.state;
 
@@ -169,12 +358,21 @@ class SystemDict extends React.Component {
               )}
             </div>
             <StandardTable
+              components={components}
               bordered={true}
               loading={loading}
               selectedRows={selectedRows}
-              columns={this.columns}
+              columns={columnsa}
               rowKey={'dictId'}
               data={pageData}
+              pagination={false}
+              rowClassName={(record, index) => {
+                // const className = styles.editableRow;
+                // //   const className ='editable-row';
+                // return className;
+
+              }}
+
               onSelectRow={this.handleSelectRows}
             />
           </div>
