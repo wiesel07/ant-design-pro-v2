@@ -24,11 +24,24 @@ export async function addUser(params) {
   });
 }
 
+export async function updateUser(params) {
+  return request(`${baseUrl}/system/user/update`, {
+    method: 'PUT',
+    body: {
+      ...params,
+    },
+  });
+}
+
+export async function getUserDetail(params) {
+  return request(`${baseUrl}/system/user/detail?${stringify(params)}`);
+}
+
 
 // 字典模块接口
 export async function queryDictPage(params) {
-   return request(`${baseUrl}/system/dict/pages?${stringify(params)}`);
-   // return request('/api/system/sysDict/pages');
+  return request(`${baseUrl}/system/dict/pages?${stringify(params)}`);
+  // return request('/api/system/sysDict/pages');
 }
 
 export async function removeDict(params) {
