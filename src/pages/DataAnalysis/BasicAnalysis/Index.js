@@ -23,24 +23,13 @@ import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import Result from '@/components/Result';
 import DeleteConfirm from '@/components/DeleteConfirm';
 import BusTable from '@/components/BusTable';
+import { formatDateTime } from "@/utils/dateUtils";
 
 const FormItem = Form.Item;
 const { Option } = Select;
 const { TextArea } = Input;
-const modelName = 'System.User';
+const modelName = 'DataAnalysis.BasicAnalysis';
 import styles from './BasicAnalysis.less';
-
-// const actions = {
-//     ADD: "ADD",
-//     UPDATE: "UPDATE",
-//     VIEW: "VIEW",
-// }
-const status = {
-  '1': '正常',
-  '2': '锁定',
-  '3': '停用',
-  '4': '注销',
-};
 
 
 const SearchForm = Form.create()(props => {
@@ -71,20 +60,8 @@ const SearchForm = Form.create()(props => {
     <Form layout="inline">
       <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
         <Col md={8} sm={24}>
-          <FormItem label="用户编码">
-            {getFieldDecorator('userCode')(<Input placeholder="请输入" />)}
-          </FormItem>
-        </Col>
-        <Col md={8} sm={24}>
-          <FormItem label="状态">
-            {getFieldDecorator('status')(
-              <Select placeholder="请选择" style={{ width: '100%' }}>
-                <Option value="1">正常</Option>
-                <Option value="2">锁定</Option>
-                <Option value="3">停用</Option>
-                <Option value="9">注销</Option>
-              </Select>
-            )}
+          <FormItem label="赛事名">
+            {getFieldDecorator('matchName')(<Input placeholder="请输入" />)}
           </FormItem>
         </Col>
         <Col md={8} sm={24}>
@@ -105,14 +82,14 @@ const SearchForm = Form.create()(props => {
 
 @connect(state => {
   return {
-      pageData: state[modelName].pageData,
-      initDetailData: state[modelName].initDetailData,
-      //  loading: state.loading.models[modelName],
-      loading: state.loading.effects['System.User/queryPage'],
+    pageData: state[modelName].pageData,
+    initDetailData: state[modelName].initDetailData,
+    //  loading: state.loading.models[modelName],
+    loading: state.loading.effects['DataAnalysis.BasicAnalysis/queryPage'],
   };
 })
 @Form.create()
-class SystemUser extends React.Component {
+class BasicAnalysis extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -136,31 +113,46 @@ class SystemUser extends React.Component {
         render: (text, record, index) => `${index + 1}`,
       },
       {
-        title: '用户名',
-        dataIndex: 'userName',
+        title: '赛事名',
+        dataIndex: 'matchName',
         render: (text, record) => {
           return text;
         }
       },
       {
-        title: '用户编码',
-        dataIndex: 'userCode',
-        // width: 300,
-      },
-      {
-        title: '用户类型',
-        dataIndex: 'userType',
-      },
-      {
-        title: '手机号码',
-        dataIndex: 'mobileNo',
-      },
-      {
-        title: '状态',
-        dataIndex: 'status',
+        title: '比赛时间',
+        dataIndex: 'matchDate',
         render: (text, record) => {
-          return status[text];
-        },
+          return formatDateTime(text);
+        }
+      },
+      {
+        title: '主队',
+        dataIndex: 'homeTeam',
+        render: (text, record) => {
+          return text + "-" + record.homeRank;
+        }
+      },
+      {
+        title: '客队',
+        dataIndex: 'guestTeam',
+        render: (text, record) => {
+          return text + "-" + record.guestRank;
+        }
+      },
+      {
+        title: '半场比分',
+        dataIndex: 'homeHalfScore',
+        render: (text, record) => {
+          return record.homeHalfScore + "-" + record.guestHalfScore;
+        }
+      },
+      {
+        title: ' 全场比分',
+        dataIndex: 'homeFinalScore',
+        render: (text, record) => {
+          return record.homeFinalScore + "-" + record.guestFinalScore;
+        }
       },
       {
         title: '操作',
@@ -177,7 +169,7 @@ class SystemUser extends React.Component {
           <Divider type="vertical" /> */}
             <DeleteConfirm
               method={`${modelName}/remove`}
-              params={{ id: record.userId }}
+              params={{ id: record.matchId }}
               dispatch={this.props.dispatch}
               callback={this.refreshTable}
             />
@@ -240,7 +232,7 @@ class SystemUser extends React.Component {
     const { dispatch } = this.props;
     dispatch({
       type: `${modelName}/detail`,
-      payload: { id: item.userId },
+      payload: { id: item.matchId },
     }).then(() => {
       this.setState({
         modalVisible: true,
@@ -364,19 +356,7 @@ class SystemUser extends React.Component {
             initialValue: initDetailData.mobileNo,
           })(<Input addonBefore={prefixSelector} style={{ width: '100%' }} />)}
         </FormItem>
-        <FormItem label='状态' {...this.formLayout}>
-          {getFieldDecorator('status', {
-            rules: [{ required: true, message: '请选择状态' }],
-            initialValue: initDetailData.status,
-          })(
-            <Select placeholder="请选择状态">
-              <Option value="1">正常</Option>
-              <Option value="2">锁定</Option>
-              <Option value="3">停用</Option>
-              <Option value="4">注销</Option>
-            </Select>
-          )}
-        </FormItem>
+      
         <FormItem {...this.formLayout} label="备注">
           {getFieldDecorator('remark', {
             rules: [{ message: '请输入至少五个字符的备注述！', min: 5 }],
@@ -406,7 +386,7 @@ class SystemUser extends React.Component {
       refreshTable: this.refreshTable,
     };
     return (
-      <PageHeaderWrapper title="用户管理">
+      <PageHeaderWrapper title="基础分析">
         <Card bordered={false}>
           <div className={styles.tableList}>
             {/* <div className={styles.tableListForm}>{this.renderSimpleForm()}</div> */}
@@ -442,7 +422,7 @@ class SystemUser extends React.Component {
               loading={loading}
               selectedRows={selectedRows}
               columns={this.columns}
-              rowKey={'userId'}
+              rowKey={'matchId'}
               data={pageData}
               onSelectRow={this.handleSelectRows}
               onChange={this.handleStandardTableChange}
@@ -451,7 +431,7 @@ class SystemUser extends React.Component {
         </Card>
 
         <Modal
-          title={modalDone ? null : `用户${current.userId ? '编辑' : '添加'}`}
+          title={modalDone ? null : `${current.matchId ? '编辑' : '添加'}`}
           className={styles.standardListForm}
           width={640}
           bodyStyle={modalDone ? { padding: '72px 0' } : { padding: '28px 0 0' }}
@@ -466,4 +446,4 @@ class SystemUser extends React.Component {
   }
 }
 
-export default SystemUser;
+export default BasicAnalysis;

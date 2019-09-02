@@ -366,7 +366,7 @@ class SystemDict extends React.Component {
               columns={columnsa}
               rowKey={'dictId'}
               data={pageData}
-              pagination={false}
+              pagination={true}
               rowClassName={(record, index) => {
                 // const className = styles.editableRow;
                 // //   const className ='editable-row';

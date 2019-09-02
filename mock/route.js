@@ -217,6 +217,23 @@ export default {
           },
         ],
       },
+
+        // system权限管理
+        {
+          path: '/dataAnalysis',
+          icon: 'table',
+          name: '数据分析',
+          routes: [
+            {
+              path: '/dataAnalysis/basicAnalysis/index',
+              name: '基础分析',
+            },
+            {
+              path: '/dataAnalysis/oddsAnalysis/index',
+              name: 'Odds分析',
+            },
+          ],
+        },
     ],
   },
 };
