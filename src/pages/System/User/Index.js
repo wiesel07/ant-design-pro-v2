@@ -105,9 +105,10 @@ const SearchForm = Form.create()(props => {
 
 @connect(state => {
   return {
-    pageData: state[modelName].pageData,
-    initDetailData: state[modelName].initDetailData,
-    loading: state.loading.models[modelName],
+      pageData: state[modelName].pageData,
+      initDetailData: state[modelName].initDetailData,
+      //  loading: state.loading.models[modelName],
+      loading: state.loading.effects['System.User/queryPage'],
   };
 })
 @Form.create()
@@ -316,7 +317,7 @@ class SystemUser extends React.Component {
       );
     }
 
-    if(!initDetailData){
+    if (!initDetailData) {
       return '';
     }
     const prefixSelector = getFieldDecorator('prefix', {
@@ -390,7 +391,6 @@ class SystemUser extends React.Component {
   render() {
     const { pageData, loading, initDetailData } = this.props;
 
-    console.log("明细数据：" +  JSON.stringify(initDetailData))
     const { selectedRows, modalVisible, modalDone, current = {} } = this.state;
 
     const modalContent = this.getModalContent(modalDone, initDetailData);

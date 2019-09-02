@@ -153,12 +153,12 @@ class SystemDict extends React.Component {
         title: '字典名称',
         dataIndex: 'dictName',
         render: (text, record) => {
-          const obj = {
-            children: text,
-            props: {},
-          };
-          obj.props.rowSpan = record.rowSpan;
-          return obj;
+          // const obj = {
+          //   children: text,
+          //   props: {},
+          // };
+          // obj.props.rowSpan = record.rowSpan;
+          return text;
         },
       },
       {
@@ -170,7 +170,8 @@ class SystemDict extends React.Component {
         title: '上传',
         dataIndex: 'status',
         render: (text, record) => {
-          return <UploadFile test={text} /> 
+          // return <UploadFile test={text} /> 
+          return text;
         }
 
       },
@@ -256,65 +257,65 @@ class SystemDict extends React.Component {
   };
 
   //遍历子元素，并赋值纵向合并数rowSpan
-  makeData = (data) => {
-    if (!data) return;
-    const sortResult = this.sortData(data);
-    const dataSource = [];
-    sortResult.forEach((item) => {
-      if (item.children) {
-        item.children.forEach((itemOne, indexOne) => {
-          const myObj = itemOne;
-          myObj.rowSpan = indexOne === 0 ? item.span : 0;
-          dataSource.push(myObj);
-        });
-      }
-    });
-    return dataSource;
-  }
+  // makeData = (data) => {
+  //   if (!data) return;
+  //   const sortResult = this.sortData(data);
+  //   const dataSource = [];
+  //   sortResult.forEach((item) => {
+  //     if (item.children) {
+  //       item.children.forEach((itemOne, indexOne) => {
+  //         const myObj = itemOne;
+  //         myObj.rowSpan = indexOne === 0 ? item.span : 0;
+  //         dataSource.push(myObj);
+  //       });
+  //     }
+  //   });
+  //   return dataSource;
+  // }
 
-  //去重并合并到children
-  sortData = (dataArr) => {
-    const orgArrRe = dataArr.map(item => ({ dictName: item.dictName }));
-    const orgArr = this.uniqueObjArr(orgArrRe, 'dictName');//数组去重
-    for (const childOne of orgArr) { //去重reportName合并到children，得到一共有几个不同的reportName要合并
-      childOne.children = [];
-      for (const childTwo of dataArr) {
-        if (childOne.dictName === childTwo.dictName) { //childOne是去重的，childTwo是没去重的
-          childOne.children.push(childTwo);
-        }
-      }
-    }
-    for (const every of orgArr) {
-      every.span = every.children ? every.children.length : 0;
-    }
-    orgArr.forEach((every) => { every.span = every.children ? every.children.length : 0; });
-    return orgArr;
-  }
+  // //去重并合并到children
+  // sortData = (dataArr) => {
+  //   const orgArrRe = dataArr.map(item => ({ dictName: item.dictName }));
+  //   const orgArr = this.uniqueObjArr(orgArrRe, 'dictName');//数组去重
+  //   for (const childOne of orgArr) { //去重reportName合并到children，得到一共有几个不同的reportName要合并
+  //     childOne.children = [];
+  //     for (const childTwo of dataArr) {
+  //       if (childOne.dictName === childTwo.dictName) { //childOne是去重的，childTwo是没去重的
+  //         childOne.children.push(childTwo);
+  //       }
+  //     }
+  //   }
+  //   for (const every of orgArr) {
+  //     every.span = every.children ? every.children.length : 0;
+  //   }
+  //   orgArr.forEach((every) => { every.span = every.children ? every.children.length : 0; });
+  //   return orgArr;
+  // }
 
-  //对象数组去重
-  uniqueObjArr = (arr, fieldName) => {
-    const result = [];
-    const resultArr = [];
-    for (const child of arr) {
-      if (result.indexOf(child[fieldName]) === -1) {
-        result.push(child[fieldName]);
-        resultArr.push(child);
-      }
-    }
-    return resultArr;
-  }
+  // //对象数组去重
+  // uniqueObjArr = (arr, fieldName) => {
+  //   const result = [];
+  //   const resultArr = [];
+  //   for (const child of arr) {
+  //     if (result.indexOf(child[fieldName]) === -1) {
+  //       result.push(child[fieldName]);
+  //       resultArr.push(child);
+  //     }
+  //   }
+  //   return resultArr;
+  // }
 
   render() {
     const { pageData, loading } = this.props;
 
-    const makeData = this.makeData(pageData.list);
-    pageData.list = makeData;
-    const components = {
-      body: {
-        row: EditableFormRow,
-        cell: EditableCell,
-      },
-    };
+    // const makeData = this.makeData(pageData.list);
+    // pageData.list = makeData;
+    // const components = {
+    //   body: {
+    //     row: EditableFormRow,
+    //     cell: EditableCell,
+    //   },
+    // };
     const columnsa = this.columns.map(col => {
       if (!col.editable) {
         return col;
@@ -358,7 +359,7 @@ class SystemDict extends React.Component {
               )}
             </div>
             <StandardTable
-              components={components}
+             // components={components}
               bordered={true}
               loading={loading}
               selectedRows={selectedRows}
